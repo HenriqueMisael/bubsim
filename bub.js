@@ -1,31 +1,28 @@
-const consistencyFactory = (init, end) => () => int(random(init, end));
-
 class Bub extends RigidBody {
-  static planPath(velocityOptions, consistency) {
-    const velocities = [];
-    const chosen = int(random(0, velocityOptions.length - 1));
-    for (let i = consistency; i > 0; i--) velocities.push(velocityOptions[chosen]);
-    return velocities;
-  }
 
   constructor(
     x,
     y,
     color,
-    size = random(10, 20),
-    velocityOptions = [
+    size = random(5, 10),
+    accelerationOptions = [
       p5.Vector.random2D(),
       p5.Vector.random2D(),
       p5.Vector.random2D(),
       p5.Vector.random2D(),
     ],
-    consistency = consistencyFactory(int(random(1, 10)), int(random(1, 30)))
+    maxSpeed = random(1, 4),
+    lineOfSight = random(10, 40),
+    agility = 1
   ) {
-    super(x, y, size);
+    super(x, y, size, ['bub']);
     this.color = color;
-    this.velocityOptions = velocityOptions;
-    this.consistency = consistency;
-    this.velocities = [];
+    this.accelerationOptions = accelerationOptions;
+    this.acceleration = createVector();
+    this.velocity = p5.Vector.random2D();
+    this.maxSpeed = maxSpeed;
+    this.lineOfSight = lineOfSight;
+    this.agility = agility;
   }
 
   edges() {
@@ -41,14 +38,43 @@ class Bub extends RigidBody {
     }
   }
 
+  preventCollisions(population) {
+      const steering = createVector();
+      let total = 0;
+
+      for (let other of population) {
+        if (this.willCollideWith(other)) {
+          let diff = p5.Vector.sub(this.position, other.position);
+          diff.div(dist(this.position, other.position));
+          steering.add(diff);
+          total++;
+        }
+      }
+
+      if (total > 0) {
+        steering.div(total);
+        steering.setMag(this.maxSpeed);
+        steering.sub(this.velocity);
+        steering.limit(this.agility);
+      }
+
+      this.acceleration.add(steering);
+  }
+
+  willCollideWith(other) {
+    return checkCollision(other, this.position, this.size + this.lineOfSight);
+  }
+
   update() {
-    if (this.velocities.length === 0)
-      this.velocities = Bub.planPath(this.velocityOptions, this.consistency());
-    else this.position.add(this.velocities.pop());
+    this.acceleration.add(this.accelerationOptions[0]);
+    this.position.add(this.velocity);
+    this.velocity.add(this.acceleration);
+    this.velocity.limit(this.maxSpeed);
+    this.acceleration.mult(0);
   }
 
   draw() {
-    strokeWeight(this.size);
+    strokeWeight(this.size*2);
     stroke(this.color);
     point(this.position.x, this.position.y);
   }
