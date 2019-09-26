@@ -1,11 +1,9 @@
-const flock = [];
-
-let alignSlider, cohesionSlider, separationSlider;
+const populations = [];
 
 const createObjectFactory = basis =>
   function() {
     const [r, g, b] = [random(0, basis * 27), random(0, basis * 29), random(0, basis * 31)];
-    flock.push(new RigidBody(basis * 20, 0, color(r, g, b)));
+    populations.push(new Bub(basis * 20, 0, color(r, g, b)));
   };
 
 function setup() {
@@ -17,7 +15,7 @@ function setup() {
 
 function draw() {
   background(51);
-  flock.forEach(bub => {
+  populations.forEach(bub => {
     bub.update();
     bub.edges();
     bub.draw();
