@@ -1,5 +1,4 @@
 class Bub extends RigidBody {
-
   constructor(
     x,
     y,
@@ -12,8 +11,8 @@ class Bub extends RigidBody {
       p5.Vector.random2D(),
     ],
     maxSpeed = random(1, 4),
-    lineOfSight = random(10, 40),
-    agility = 1
+    lineOfSight = random(20, 40),
+    agility = random(1, 3)
   ) {
     super(x, y, size, ['bub']);
     this.color = color;
@@ -39,26 +38,25 @@ class Bub extends RigidBody {
   }
 
   preventCollisions(population) {
-      const steering = createVector();
-      let total = 0;
+    const steering = createVector();
+    let total = 0;
 
-      for (let other of population) {
-        if (this.willCollideWith(other)) {
-          let diff = p5.Vector.sub(this.position, other.position);
-          diff.div(dist(this.position, other.position));
-          steering.add(diff);
-          total++;
-        }
+    for (let other of population) {
+      if (this.willCollideWith(other)) {
+        let diff = p5.Vector.sub(this.position, other.position);
+        steering.add(diff);
+        total++;
       }
+    }
 
-      if (total > 0) {
-        steering.div(total);
-        steering.setMag(this.maxSpeed);
-        steering.sub(this.velocity);
-        steering.limit(this.agility);
-      }
+    if (total > 0) {
+      steering.div(total);
+      steering.setMag(this.maxSpeed);
+      steering.sub(this.velocity);
+      steering.limit(this.agility);
+    }
 
-      this.acceleration.add(steering);
+    this.acceleration.add(steering);
   }
 
   willCollideWith(other) {
@@ -74,7 +72,7 @@ class Bub extends RigidBody {
   }
 
   draw() {
-    strokeWeight(this.size*2);
+    strokeWeight(this.size * 2);
     stroke(this.color);
     point(this.position.x, this.position.y);
   }

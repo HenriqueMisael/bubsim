@@ -1,4 +1,5 @@
-const population = [];
+let population = [];
+let markedDeletion = [];
 
 const createObjectFactory = basis =>
   function() {
@@ -8,7 +9,7 @@ const createObjectFactory = basis =>
 
 function setup() {
   createCanvas(800, 600);
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 40; i++) {
     setTimeout(createObjectFactory(i), i * 1000);
   }
 }
@@ -20,5 +21,13 @@ function draw() {
     bub.preventCollisions(population);
     bub.update();
     bub.draw();
+    const collided = population.find(other => other.id !== bub.id && bub.hadCollideWith(other));
+    if (collided) {
+      markedDeletion.push(collided);
+      markedDeletion.push(bub);
+    }
   });
+
+  population = population.filter(bub => !markedDeletion.includes(bub));
+  markedDeletion = [];
 }
