@@ -1,20 +1,18 @@
 let nextID = 0;
 
-class RigidBody {
-    constructor(
-        x,
-        y,
-        size,
-        tags = []
-    ) {
-        this.position = createVector(x, y);
-        this.size = size;
-        this.tags = tags;
+class RigidBody extends GameObject {
+  constructor(x, y, size, tags = []) {
+    super();
+    this.position = createVector(x, y);
+    this.size = size;
+    this.tags = tags;
 
-        this.id = nextID++;
-    }
+    this.id = nextID++;
+  }
 
-    hadCollideWith(other) {
-        return checkCollision(other, this.position, this.size);
-    }
+  hadCollideWith(other) {
+    return checkCollision(other, this.position, this.size);
+  }
+
+  onCollision(other) {}
 }
