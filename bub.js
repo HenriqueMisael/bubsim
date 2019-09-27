@@ -5,10 +5,7 @@ class Bub extends RigidBody {
     color,
     size = random(5, 10),
     accelerationOptions = [
-      p5.Vector.random2D(),
-      p5.Vector.random2D(),
-      p5.Vector.random2D(),
-      p5.Vector.random2D(),
+      new AccelerationOption()
     ],
     maxSpeed = random(1, 4),
     lineOfSight = random(20, 40),
@@ -51,9 +48,8 @@ class Bub extends RigidBody {
 
     if (total > 0) {
       steering.div(total);
-      steering.setMag(this.maxSpeed);
-      steering.sub(this.velocity);
       steering.limit(this.agility);
+      this.accelerationOptions.unshift(new AccelerationOption(steering));
     }
 
     this.acceleration.add(steering);
@@ -63,12 +59,28 @@ class Bub extends RigidBody {
     return checkCollision(other, this.position, this.size + this.lineOfSight);
   }
 
+  chooseAcceleration() {
+
+    const total = this.accelerationOptions.reduce((acc, accelerationOption) => acc + accelerationOption.probability, 0);
+    let randomNumber = random(0, total);
+
+    let i = 0;
+    for(let option of this.accelerationOptions) {
+      if(option.probability >= randomNumber) {
+        return option.vector;
+      }
+      i++;
+      randomNumber -= option.probability;
+    }
+  }
+
   update() {
-    this.acceleration.add(this.accelerationOptions[0]);
+    if(this.acceleration.x === 0 && this.acceleration.y === 0)
+      this.acceleration.add(this.chooseAcceleration());
     this.position.add(this.velocity);
     this.velocity.add(this.acceleration);
     this.velocity.limit(this.maxSpeed);
-    this.acceleration.mult(0);
+    this.acceleration.mult(0)
   }
 
   draw() {
