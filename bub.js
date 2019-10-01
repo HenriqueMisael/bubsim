@@ -1,4 +1,7 @@
 class Bub extends RigidBody {
+
+  static baseEnergy = 1000;
+
   constructor(
     x,
     y,
@@ -7,7 +10,7 @@ class Bub extends RigidBody {
     maxSpeed = random(1, 4),
     lineOfSight = random(20, 40),
     agility = random(1, 3),
-    energy = 1000,
+    energy = Bub.baseEnergy,
     metabolismEffectiveness = random(0, 10),
     accelerationOptions = [new AccelerationOption()]
   ) {
@@ -58,7 +61,7 @@ class Bub extends RigidBody {
   }
 
   checkFoodNearby(food) {
-    if(this.target) return;
+    if (this.target) return;
 
     for (let other of food) {
       if (this.isOnLineOfSight(other)) {
@@ -95,7 +98,7 @@ class Bub extends RigidBody {
   }
 
   consumeEnergy(amount) {
-    if(amount >= this.energy) this.dispatch("destroy");
+    if (amount >= this.energy) this.dispatch("destroy");
 
     this.energy -= amount;
   }
@@ -133,5 +136,25 @@ class Bub extends RigidBody {
     if (other.tags.includes('food')) {
       this.energy += other.size * this.metabolismEffectiveness;
     }
+  }
+
+  breed(couple) {
+
+    const thisEnergy = this.energy / 3;
+    this.energy -= thisEnergy;
+
+    const coupleEnergy = couple.energy / 3;
+    couple.energy -= coupleEnergy;
+
+    return new Bub(0, 0,
+      lerpColor(this.color, couple.color, 0.5),
+      (this.size + couple.size) / 2,
+      (this.maxSpeed + couple.maxSpeed) / 2,
+      (this.lineOfSight + couple.lineOfSight) / 2,
+      (this.agility + couple.agility) / 2,
+      thisEnergy + coupleEnergy,
+      (this.metabolismEffectiveness + couple.metabolismEffectiveness) / 2,
+      this.accelerationOptions.concat(couple.accelerationOptions)
+    );
   }
 }

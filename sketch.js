@@ -5,6 +5,7 @@ let food = [];
 
 let input;
 let turn;
+let generation;
 
 function add(bub) {
   bub.addListener("destroy", ({dispatcher}) => {
@@ -27,16 +28,17 @@ function setup() {
     add(species.BLUE(i * 100, 500));
   }
   turn = 0;
+  generation = 0;
 }
 
-function draw() {
+function drawTurn() {
   background(51);
 
   if (turn++ % 100 === 0) {
     replenishFood(food);
   }
 
-  input.value(`Turn: ${turn}`);
+  input.value(`Gen. ${generation} Turn: ${turn}`);
 
   food.forEach(food => food.draw());
 
@@ -58,6 +60,37 @@ function draw() {
       }
     }
   });
+}
+
+function distribute(newPopulation) {
+
+  const lines = newPopulation.length /10;
+  const step = width/(newPopulation.length/lines);
+  let x = 0;
+  for(let i = 0; i < lines; i++) {
+    for(let j = 0; j < width-step; j += step) {
+      newPopulation[x++].position = createVector(i * 30, j);
+    }
+  }
+
+  return newPopulation;
+}
+
+function draw() {
+  if (turn % 1000 === 0) {
+    const newPopulation = [];
+
+    for (let i = 0; i < population.length; i += 2) {
+      if (i + 1 < population.length) {
+        newPopulation.push(population[i].breed(population[i + 1]));
+        newPopulation.push(population[i + 1]);
+      }
+      newPopulation.push(population[i]);
+    }
+
+    population = distribute(newPopulation);
+  }
+  drawTurn();
 }
 
 function replenishFood(food) {
