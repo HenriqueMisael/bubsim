@@ -11,7 +11,7 @@ class Food extends RigidBody {
 
   onCollision(other) {
     if (other.tags.includes('bub')) {
-      this.size = 0;
+      this.dispatch("destroy");
     }
   }
 }

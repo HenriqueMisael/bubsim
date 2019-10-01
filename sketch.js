@@ -57,9 +57,14 @@ function draw() {
     }
     dead.push(bub);
   });
-  food = food.filter(food => food.size > 0);
 }
 
 function replenishFood(food) {
-  for (let i = 0; i < 100; i++) food.push(new Food(int(random(0, width)), int(random(0, height))));
+  for (let i = 0; i < 100; i++) {
+    const newFood = new Food(int(random(0, width)), int(random(0, height)));
+
+    newFood.addListener("destroy", ({dispatcher}) => food.splice(food.indexOf(dispatcher), 1));
+
+    food.push(newFood);
+  }
 }

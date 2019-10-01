@@ -2,7 +2,7 @@ let nextID = 0;
 
 class RigidBody extends GameObject {
   constructor(x, y, size, tags = []) {
-    super();
+    super(nextID);
     this.position = createVector(x, y);
     this.size = size;
     this.tags = tags;
