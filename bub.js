@@ -60,20 +60,12 @@ class Bub extends RigidBody {
   checkFoodNearby(food) {
     if(this.target) return;
 
-    const nearbyFoods = [];
-
     for (let other of food) {
       if (this.isOnLineOfSight(other)) {
-        const position = other.position;
-        const cost = this.calculateEnergyCost(other.position * dist(this.position, position));
-        const size = other.size;
-        nearbyFoods.push({cost, size, position});
+        other.addListener("destroy", () => delete this.target);
+        this.target = other;
+        return;
       }
-    }
-
-    if (nearbyFoods.length > 0) {
-      const betterOption = nearbyFoods.sort((a, b) => b.size / b.cost - a.size / a.cost)[0];
-      this.target = betterOption;
     }
   }
 
@@ -102,6 +94,12 @@ class Bub extends RigidBody {
     return (abs(velocity.x) + abs(velocity.y)) * 0.05 * this.size + this.size * 0.03;
   }
 
+  consumeEnergy(amount) {
+    if(amount >= this.energy) this.dispatch("destroy");
+
+    this.energy -= amount;
+  }
+
   update() {
 
     if (this.target) {
@@ -117,7 +115,7 @@ class Bub extends RigidBody {
     this.velocity.add(this.acceleration);
     this.velocity.limit(this.maxSpeed);
 
-    this.energy -= this.calculateEnergyCost(this.acceleration);
+    this.consumeEnergy(this.calculateEnergyCost(this.acceleration))
     this.acceleration.mult(0);
   }
 
@@ -129,12 +127,11 @@ class Bub extends RigidBody {
 
   onCollision(other) {
     if (other.tags.includes('bub') && other.size >= this.size) {
-      this.energy = 0;
+      this.dispatch("destroy");
     }
 
     if (other.tags.includes('food')) {
       this.energy += other.size * this.metabolismEffectiveness;
-      delete this.target;
     }
   }
 }

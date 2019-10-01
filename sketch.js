@@ -6,17 +6,25 @@ let food = [];
 let input;
 let turn;
 
+function add(bub) {
+  bub.addListener("destroy", ({dispatcher}) => {
+    population.splice(population.indexOf(dispatcher), 1);
+    dead.push(dispatcher);
+  });
+  population.push(bub);
+}
+
 function setup() {
   input = createInput();
   input.position(0, 0);
   createCanvas(800, 600);
   for (let i = 0; i < 8; i++) {
-    population.push(species.RED(i * 100, 200));
-    population.push(species.GREEN(i * 100, 400));
-    population.push(species.BLUE(i * 100, 0));
-    population.push(species.RED(i * 100, 100));
-    population.push(species.GREEN(i * 100, 300));
-    population.push(species.BLUE(i * 100, 500));
+    add(species.RED(i * 100, 200));
+    add(species.GREEN(i * 100, 400));
+    add(species.BLUE(i * 100, 0));
+    add(species.RED(i * 100, 100));
+    add(species.GREEN(i * 100, 300));
+    add(species.BLUE(i * 100, 500));
   }
   turn = 0;
 }
@@ -49,13 +57,6 @@ function draw() {
         foodFound.onCollision(bub);
       }
     }
-  });
-
-  population = population.filter(bub => {
-    if (bub.energy > 0) {
-      return true;
-    }
-    dead.push(bub);
   });
 }
 
