@@ -1,70 +1,63 @@
-let population = [];
-let dead = [];
-
-let food = [];
-
+let simulation;
 let input;
 let turn;
+let turnsByFrameInput;
+let turnsByFrame;
+let buttonConfirmTurnsByFrame;
 
-function add(bub) {
-  bub.addListener("destroy", ({dispatcher}) => {
+function add(population, bub) {
+  bub.addListener('destroy', ({ dispatcher }) => {
     population.splice(population.indexOf(dispatcher), 1);
-    dead.push(dispatcher);
   });
   population.push(bub);
+  setFrameRate(60);
 }
 
 function setup() {
   input = createInput();
   input.position(0, 0);
+  turnsByFrameInput = createInput();
+  turnsByFrameInput.position(200, 0);
+  buttonConfirmTurnsByFrame = createButton('Change turns by frame');
+  buttonConfirmTurnsByFrame.position(310, 0);
+  buttonConfirmTurnsByFrame.mousePressed(() => (turnsByFrame = turnsByFrameInput.value()));
   createCanvas(800, 600);
-  for (let i = 0; i < 8; i++) {
-    add(species.RED(i * 100, 200));
-    add(species.GREEN(i * 100, 400));
-    add(species.BLUE(i * 100, 0));
-    add(species.RED(i * 100, 100));
-    add(species.GREEN(i * 100, 300));
-    add(species.BLUE(i * 100, 500));
-  }
-  turn = 0;
+
+  simulation = setupSimulation();
+  turnsByFrame = 1;
 }
 
-function draw() {
-  background(51);
-
-  if (turn++ % 100 === 0) {
-    replenishFood(food);
-  }
-
-  input.value(`Turn: ${turn}`);
-
-  food.forEach(food => food.draw());
-
-  population.forEach(bub => {
-    bub.edges();
-    bub.preventCollisions(population);
-    bub.checkFoodNearby(food);
-    bub.update();
-    bub.draw();
-    const collided = population.find(other => other.id !== bub.id && bub.hadCollideWith(other));
-    if (collided) {
-      bub.onCollision(collided);
-      collided.onCollision(bub);
-    } else {
-      const foodFound = food.find(food => bub.hadCollideWith(food));
-      if (foodFound) {
-        bub.onCollision(foodFound);
-        foodFound.onCollision(bub);
-      }
+function setupSimulation(
+  populationFactory = () => {
+    const population = [];
+    for (let i = 0; i < 8; i++) {
+      add(population, species.RED(i * 100, 200));
+      add(population, species.GREEN(i * 100, 400));
+      add(population, species.BLUE(i * 100, 0));
+      add(population, species.RED(i * 100, 100));
+      add(population, species.GREEN(i * 100, 300));
+      add(population, species.BLUE(i * 100, 500));
     }
+    return population;
+  }
+) {
+  return new Simulation(populationFactory(), {
+    shouldReplenish: turn => turn % 100 === 0,
+    replenish: replenishFood,
   });
 }
 
+function draw() {
+  const turn = simulation.draw(turnsByFrame);
+  if (turn) input.value(`Turn: ${turn}`);
+  else simulation = setupSimulation();
+}
+
 function replenishFood(food) {
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 10; i++) {
     const newFood = new Food(int(random(0, width)), int(random(0, height)));
 
-    newFood.addListener("destroy", ({dispatcher}) => food.splice(food.indexOf(dispatcher), 1));
+    newFood.addListener('destroy', ({ dispatcher }) => food.splice(food.indexOf(dispatcher), 1));
 
     food.push(newFood);
   }
