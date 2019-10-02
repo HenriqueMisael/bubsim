@@ -91,7 +91,7 @@ class Bub extends RigidBody {
   }
 
   calculateEnergyCost(velocity) {
-    return (abs(velocity.x) + abs(velocity.y)) * 0.05 * this.size + this.size * 0.03;
+    return (abs(velocity.x) + abs(velocity.y)) * 0.1 * this.size + this.size * 0.1;
   }
 
   consumeEnergy(amount) {
