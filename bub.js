@@ -1,15 +1,20 @@
 class Bub extends RigidBody {
+  /*
+   *
+   * @param {number} x
+   */
+
   constructor(
     x,
     y,
     color,
-    size = random(5, 10),
-    maxSpeed = random(1, 4),
-    lineOfSight = random(20, 40),
-    agility = random(1, 3),
-    energy = 1000,
-    metabolismEffectiveness = random(0, 10),
-    accelerationOptions = [new AccelerationOption()]
+    size,
+    maxSpeed,
+    lineOfSight,
+    agility,
+    energy,
+    metabolismEffectiveness,
+    accelerationOptions
   ) {
     super(x, y, size, ['bub']);
     this.color = color;
@@ -58,11 +63,11 @@ class Bub extends RigidBody {
   }
 
   checkFoodNearby(food) {
-    if(this.target) return;
+    if (this.target) return;
 
     for (let other of food) {
       if (this.isOnLineOfSight(other)) {
-        other.addListener("destroy", () => delete this.target);
+        other.addListener('destroy', () => delete this.target);
         this.target = other;
         return;
       }
@@ -95,13 +100,12 @@ class Bub extends RigidBody {
   }
 
   consumeEnergy(amount) {
-    if(amount >= this.energy) this.dispatch("destroy");
+    if (amount >= this.energy) this.dispatch('destroy');
 
     this.energy -= amount;
   }
 
   update() {
-
     if (this.target) {
       const acceleration = this.target.position.copy();
       acceleration.sub(this.position);
@@ -115,7 +119,7 @@ class Bub extends RigidBody {
     this.velocity.add(this.acceleration);
     this.velocity.limit(this.maxSpeed);
 
-    this.consumeEnergy(this.calculateEnergyCost(this.acceleration))
+    this.consumeEnergy(this.calculateEnergyCost(this.acceleration));
     this.acceleration.mult(0);
   }
 
@@ -127,7 +131,7 @@ class Bub extends RigidBody {
 
   onCollision(other) {
     if (other.tags.includes('bub') && other.size >= this.size) {
-      this.dispatch("destroy");
+      this.dispatch('destroy');
     }
 
     if (other.tags.includes('food')) {

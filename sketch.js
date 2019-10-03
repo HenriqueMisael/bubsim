@@ -38,6 +38,7 @@ function setupSimulation(
       add(population, species.GREEN(i * 100, 300));
       add(population, species.BLUE(i * 100, 500));
     }
+
     return population;
   }
 ) {
