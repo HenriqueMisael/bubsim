@@ -24,8 +24,8 @@ class BubBuilder {
     maxSpeed = random(1, 4),
     lineOfSight = random(20, 40),
     agility = random(1, 3),
-    energy = 1000,
     metabolismEffectiveness = random(0, 10),
+    energy = 1000,
     accelerationOptions = [new AccelerationOption()]
   ) {
     this.color = color;
@@ -60,8 +60,8 @@ class BubBuilder {
       this.maxSpeed,
       this.lineOfSight,
       this.agility,
-      this.energy,
       this.metabolismEffectiveness,
+      this.energy,
       this.accelerationOptions
     );
   }
