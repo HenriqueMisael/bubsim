@@ -13,7 +13,7 @@ class Simulation {
 
   draw(turnsToRun = 1) {
     while (turnsToRun--) {
-      if (this.turn++ >= 1000) return false;
+      if (this.turn++ >= 250) return false;
       background(51);
 
       if (this.foodReplenishRule.shouldReplenish(this.turn)) {

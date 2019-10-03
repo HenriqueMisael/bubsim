@@ -1,9 +1,4 @@
 class Bub extends RigidBody {
-  /*
-   *
-   * @param {number} x
-   */
-
   constructor(
     x,
     y,
@@ -12,8 +7,8 @@ class Bub extends RigidBody {
     maxSpeed,
     lineOfSight,
     agility,
-    energy,
     metabolismEffectiveness,
+    energy,
     accelerationOptions
   ) {
     super(x, y, size, ['bub']);
@@ -26,6 +21,7 @@ class Bub extends RigidBody {
     this.agility = agility;
     this.energy = energy;
     this.metabolismEffectiveness = metabolismEffectiveness;
+    this.age = 0;
   }
 
   edges() {
@@ -121,6 +117,7 @@ class Bub extends RigidBody {
 
     this.consumeEnergy(this.calculateEnergyCost(this.acceleration));
     this.acceleration.mult(0);
+    this.age++;
   }
 
   draw() {
@@ -130,12 +127,31 @@ class Bub extends RigidBody {
   }
 
   onCollision(other) {
-    if (other.tags.includes('bub') && other.size >= this.size) {
-      this.dispatch('destroy');
+    if (other.tags.includes('bub')) {
+      const power = this.energy * this.size;
+      const otherPower = other.energy * other.size;
+      if (otherPower >= power) this.dispatch('destroy');
+      else {
+        this.energy -= otherPower / this.size;
+      }
     }
 
     if (other.tags.includes('food')) {
       this.energy += other.size * this.metabolismEffectiveness;
     }
+  }
+
+  breed(other) {
+    const position = p5.Vector.lerp(this.position, other.position, 0.5);
+    return new BubBuilder(
+      lerpColor(this.color, other.color, 0.5),
+      lerp(this.size, other.size, 0.5),
+      lerp(this.maxSpeed, other.maxSpeed, 0.5),
+      lerp(this.lineOfSight, other.lineOfSight, 0.5),
+      lerp(this.agility, other.agility, 0.5),
+      lerp(this.metabolismEffectiveness, other.metabolismEffectiveness, 0.5)
+    )
+      .mutate()
+      .build(position.x, position.y);
   }
 }

@@ -1,6 +1,6 @@
 class Food extends RigidBody {
-  constructor(x, y) {
-    super(x, y, random(1, 4), ['food']);
+  constructor(x, y, size = random(1, 4)) {
+    super(x, y, size, ['food']);
   }
 
   draw() {
@@ -11,7 +11,7 @@ class Food extends RigidBody {
 
   onCollision(other) {
     if (other.tags.includes('bub')) {
-      this.dispatch("destroy");
+      this.dispatch('destroy');
     }
   }
 }
